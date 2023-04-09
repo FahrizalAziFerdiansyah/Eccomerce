@@ -14,6 +14,8 @@ import DateTime from './DateTime';
 import SelectInput from './SelectInput';
 import BottomSheet from './BottomSheet';
 import InputArea from './InputArea';
+import ToastModify from './ToastModify';
+import ToastCustom from './ToastCustom';
 
 export {
   Container,
@@ -32,4 +34,6 @@ export {
   SelectInput,
   BottomSheet,
   InputArea,
+  ToastModify,
+  ToastCustom,
 };

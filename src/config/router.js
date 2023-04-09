@@ -102,21 +102,19 @@ const Router = () => {
   dispatch(switchMode(colorScheme));
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <Stack.Navigator screenOptions={{headerShown: false}}>
-          <Stack.Screen name="Signin" component={Signin} />
-          <Stack.Screen name="Signup" component={Signup} />
-          <Stack.Screen name="Otp" component={Otp} />
-          <Stack.Screen name="MainFeature" component={MainFeature} />
-          <Stack.Screen name="ProductDetail" component={ProductDetail} />
-          <Stack.Screen name="Cart" component={Cart} />
-          <Stack.Screen name="Checkout" component={Checkout} />
-          <Stack.Screen name="ProfileEdit" component={ProfileEdit} />
-          <Stack.Screen name="Address" component={Address} />
-          <Stack.Screen name="AddressCreate" component={AddressCreate} />
-          <Stack.Screen name="PasswordChange" component={PasswordChange} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <Stack.Navigator screenOptions={{headerShown: false}}>
+        <Stack.Screen name="Signin" component={Signin} />
+        <Stack.Screen name="Signup" component={Signup} />
+        <Stack.Screen name="Otp" component={Otp} />
+        <Stack.Screen name="MainFeature" component={MainFeature} />
+        <Stack.Screen name="ProductDetail" component={ProductDetail} />
+        <Stack.Screen name="Cart" component={Cart} />
+        <Stack.Screen name="Checkout" component={Checkout} />
+        <Stack.Screen name="ProfileEdit" component={ProfileEdit} />
+        <Stack.Screen name="Address" component={Address} />
+        <Stack.Screen name="AddressCreate" component={AddressCreate} />
+        <Stack.Screen name="PasswordChange" component={PasswordChange} />
+      </Stack.Navigator>
     </SafeAreaProvider>
   );
 };

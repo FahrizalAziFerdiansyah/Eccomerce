@@ -1,3 +1,4 @@
 import {formatCurrency} from './formatCurrency';
+import axiosInstance from './axiosInstance';
 
-export {formatCurrency};
+export {formatCurrency, axiosInstance};

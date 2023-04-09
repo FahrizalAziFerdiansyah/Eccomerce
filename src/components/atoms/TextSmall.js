@@ -3,18 +3,22 @@ import React from 'react';
 import {useSelector} from 'react-redux';
 import {FONT_FAMILY_REGULAR, FONT_SIZE_12} from '../../styles/typography';
 
-const TextSmall = ({textAlign, children, mb, color, fontSize, fontFamily}) => {
+const TextSmall = ({
+  textAlign,
+  children,
+  mb,
+  color,
+  fontSize,
+  fontFamily,
+  style,
+}) => {
   const {mode} = useSelector(state => state.themeReducer);
   return (
     <Text
-      style={styles.container(
-        textAlign,
-        mb,
-        color,
-        fontFamily,
-        mode,
-        fontSize,
-      )}>
+      style={[
+        styles.container(textAlign, mb, color, fontFamily, mode, fontSize),
+        {...style},
+      ]}>
       {children}
     </Text>
   );

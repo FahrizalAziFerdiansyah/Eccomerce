@@ -12,12 +12,13 @@ import {
   FONT_SIZE_13,
   FONT_SIZE_14,
 } from '../../styles/typography';
-import {GRAY_DARK, PRIMARY} from '../../styles/colors';
+import {ALERT, GRAY_DARK, PRIMARY} from '../../styles/colors';
 import {responsive} from '../../styles/mixins';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import TextMedium from './TextMedium';
+import TextSmall from './TextSmall';
 
-const InputPassword = ({placeholder, label}) => {
+const InputPassword = ({placeholder, label, onChange, error}) => {
   const [show, setShow] = useState(true);
   const [focus, setFocus] = useState(false);
 
@@ -28,17 +29,27 @@ const InputPassword = ({placeholder, label}) => {
           <TextMedium fontSize={FONT_SIZE_14}>{label}</TextMedium>
         </View>
       )}
-      <View style={styles.input(focus)}>
-        <TextInput
-          style={{fontFamily: FONT_FAMILY_REGULAR, flex: 1}}
-          placeholder={placeholder || ''}
-          secureTextEntry={show}
-        />
-        <TouchableOpacity
-          onPress={() => setShow(!show)}
-          style={{alignSelf: 'center', marginRight: 4}}>
-          <Icon name={show ? 'eye-slash' : 'eye'} size={responsive(20)} />
-        </TouchableOpacity>
+      <View style={{marginBottom: responsive(16)}}>
+        <View style={styles.input(focus, error)}>
+          <TextInput
+            onChangeText={onChange}
+            style={{fontFamily: FONT_FAMILY_REGULAR, flex: 1}}
+            placeholder={placeholder || ''}
+            secureTextEntry={show}
+          />
+          <TouchableOpacity
+            onPress={() => setShow(!show)}
+            style={{alignSelf: 'center', marginRight: 4}}>
+            <Icon name={show ? 'eye-slash' : 'eye'} size={responsive(20)} />
+          </TouchableOpacity>
+        </View>
+        {error && (
+          <TextSmall
+            style={{textTransform: 'capitalize', marginTop: responsive(6)}}
+            color={ALERT}>
+            {error}
+          </TextSmall>
+        )}
       </View>
     </View>
   );
@@ -47,13 +58,12 @@ const InputPassword = ({placeholder, label}) => {
 export default InputPassword;
 
 const styles = StyleSheet.create({
-  input: focus => ({
+  input: (focus, error) => ({
     paddingHorizontal: 8,
     backgroundColor: 'white',
     borderRadius: 8,
-    borderColor: focus ? PRIMARY : GRAY_DARK,
+    borderColor: error ? ALERT : focus ? PRIMARY : GRAY_DARK,
     borderWidth: 1,
-    marginBottom: responsive(16),
     flexDirection: 'row',
   }),
 });

@@ -1,12 +1,13 @@
 import {
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ButtonAction,
   Container,
@@ -27,10 +28,16 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import {configGoogle} from '../../utils';
+import {useDispatch, useSelector} from 'react-redux';
+import {clearLogin, login} from '../../redux/action/AuthAction';
 
 const Signin = () => {
   const {t, i18n} = useTranslation();
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const {loginLoading, loginResult, loginError} = useSelector(
+    state => state.authReducer,
+  );
   useEffect(() => {
     GoogleSignin.configure(configGoogle);
   }, []);
@@ -43,29 +50,65 @@ const Signin = () => {
       console.log(error.message);
     }
   };
+
+  const [form, setform] = useState({
+    phone: '',
+    password: '',
+  });
+
+  const changeForm = (input, value) => {
+    dispatch(clearLogin());
+    setform({
+      ...form,
+      [input]: value,
+    });
+  };
+
+  useEffect(() => {
+    if (loginResult) {
+      navigation.navigate('MainFeature');
+    }
+    return () => {
+      dispatch(clearLogin());
+    };
+  }, [loginResult]);
+
+  const _submit = () => {
+    dispatch(login(form));
+  };
   return (
-    <Container bg={'white'}>
-      <View style={{justifyContent: 'center', alignItems: 'center'}}>
-        <ImgLogin width={responsive(250)} height={responsive(250)} />
-      </View>
-      <View style={{marginBottom: 32}}>
-        <TextLarge fontSize={responsive(34)}>{t('login:signIn')}</TextLarge>
-        <TextSmall color={GRAY_DARK} fontSize={FONT_SIZE_16}>
-          {t('login:descSignIn')}
-        </TextSmall>
-      </View>
-      <Input label={'Phone'} placeholder={'Phone'} />
-      <InputPassword label={'Password'} placeholder={'Password'} />
-
-      <TouchableOpacity style={{alignSelf: 'flex-end'}}>
-        <TextMedium> {t('login:forgotPassword')}?</TextMedium>
-      </TouchableOpacity>
-
-      <View style={{justifyContent: 'flex-end', flex: 1}}>
-        <ButtonAction
-          onPress={() => navigation.navigate('MainFeature')}
-          title={'Login'}
+    <Container loading={loginLoading} bg={'white'}>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={{justifyContent: 'center', alignItems: 'center'}}>
+          <ImgLogin width={responsive(250)} height={responsive(250)} />
+        </View>
+        <View style={{marginBottom: 32}}>
+          <TextLarge fontSize={responsive(34)}>{t('login:signIn')}</TextLarge>
+          <TextSmall color={GRAY_DARK} fontSize={FONT_SIZE_16}>
+            {t('login:descSignIn')}
+          </TextSmall>
+        </View>
+        <Input
+          onChange={text => changeForm('phone', text)}
+          label={'Phone'}
+          placeholder={'Phone'}
+          error={loginError?.phone}
         />
+
+        <InputPassword
+          onChange={text => changeForm('password', text)}
+          label={'Password'}
+          placeholder={'Password'}
+          error={loginError?.password}
+        />
+
+        <TouchableOpacity
+          style={{alignSelf: 'flex-end', marginBottom: responsive(16)}}>
+          <TextMedium> {t('login:forgotPassword')}?</TextMedium>
+        </TouchableOpacity>
+      </ScrollView>
+      <View style={{justifyContent: 'flex-end'}}>
+        <ButtonAction onPress={() => _submit()} title={'Login'} />
         <View
           style={{flexDirection: 'row', alignSelf: 'center', marginTop: 16}}>
           <TextSmall fontSize={FONT_SIZE_14}>

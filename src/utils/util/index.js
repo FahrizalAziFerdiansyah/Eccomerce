@@ -19,6 +19,7 @@ export const configGoogle = {
   forceConsentPrompt: true,
   accountName: '',
 };
+export const BASE_URL = 'http://192.168.1.6:8000/api';
 export const dataProduct = [
   {
     category_id: 1,
