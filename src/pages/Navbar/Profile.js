@@ -1,5 +1,5 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React from 'react';
+import React, {useContext} from 'react';
 import {
   Container,
   TextLarge,
@@ -11,6 +11,7 @@ import {responsive} from '../../styles/mixins';
 import {GRAY, GRAY_DARK, GRAY_LIGHT, PRIMARY} from '../../styles/colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {useNavigation, CommonActions} from '@react-navigation/native';
+import {AuthContext} from '../../helpers/Context';
 
 const Menu = ({label, value, border = true, mb = true}) => {
   return (
@@ -49,6 +50,7 @@ const MenuColor = ({label, value, color, icon, mb = true, onPress}) => {
 };
 const Profile = () => {
   const navigation = useNavigation();
+  const {signOut} = useContext(AuthContext);
   return (
     <Container type={'navbar'}>
       <View style={{alignItems: 'center', marginTop: 16}}>
@@ -89,14 +91,7 @@ const Profile = () => {
             icon={'sign-out'}
             color={'#ff7675'}
             label={'Sign Out'}
-            onPress={() =>
-              navigation.dispatch(
-                CommonActions.reset({
-                  index: 1,
-                  routes: [{name: 'Signin'}],
-                }),
-              )
-            }
+            onPress={() => signOut()}
           />
         </View>
       </View>

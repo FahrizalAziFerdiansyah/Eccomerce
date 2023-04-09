@@ -15,11 +15,9 @@ export const login = (form, signIn) => dispatch => {
     axiosInstance()
       .post('auth/login', form)
       .then(res => {
-        ToastCustom('success', 'Success', `Your login`);
+        ToastCustom('success', 'Success', `Your login success`);
         dispatchSuccess(dispatch, LOGIN, res.data);
-        // storeData('token', res.data.token);
-        // storeData('USER', res.data.user);
-        // signIn(res.data.token);
+        storeData('token', res.data.token);
       })
       .catch(err => {
         dispatchError(dispatch, LOGIN, err.response?.data.errors);

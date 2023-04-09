@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React from 'react';
+import React, {useEffect, useMemo, useReducer} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
@@ -22,11 +22,13 @@ import {SafeAreaProvider} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {Colors} from '../styles';
 import {responsive} from '../styles/mixins';
-import {Appearance} from 'react-native';
+import {Appearance, StyleSheet, View} from 'react-native';
 import {useDispatch} from 'react-redux';
 import {switchMode} from '../redux/action/ThemeAction';
 import {GRAY_MEDIUM, PRIMARY} from '../styles/colors';
 import {FONT_FAMILY_REGULAR, FONT_SIZE_14} from '../styles/typography';
+import {getData, removeData} from '../utils';
+import {AuthContext} from '../helpers/Context';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -97,16 +99,78 @@ const MainFeature = () => {
 };
 
 const Router = () => {
-  const dispatch = useDispatch();
+  const disp = useDispatch();
   const colorScheme = Appearance.getColorScheme();
-  dispatch(switchMode(colorScheme));
+  disp(switchMode(colorScheme));
+  const initialLoginState = {
+    isLoading: true,
+    userToken: null,
+  };
+  const loginReducer = (prevState, action) => {
+    switch (action.type) {
+      case 'LOGIN':
+        return {
+          ...prevState,
+          userToken: action.userToken,
+          isLoading: false,
+        };
+      case 'LOGOUT':
+        return {
+          ...prevState,
+          userToken: null,
+          isLoading: false,
+        };
+    }
+  };
+  const [loginState, dispatch] = useReducer(loginReducer, initialLoginState);
+  const authContext = useMemo(
+    () => ({
+      signIn: async foundUser => {
+        try {
+          dispatch({
+            type: 'LOGIN',
+            userToken: foundUser,
+          });
+        } catch (error) {}
+      },
+      signOut: async () => {
+        try {
+          removeData('token');
+          dispatch({type: 'LOGOUT'});
+        } catch (e) {}
+      },
+    }),
+    [],
+  );
+
+  useEffect(() => {
+    const _condition = async () => {
+      let token = await getData('token');
+      dispatch({
+        type: 'LOGIN',
+        userToken: token,
+      });
+    };
+    setTimeout(() => {
+      _condition();
+    }, 100);
+  }, []);
+
+  if (loginState.isLoading) {
+    return <View style={styles.pendingView} />;
+  }
   return (
-    <SafeAreaProvider>
+    <AuthContext.Provider value={authContext}>
       <Stack.Navigator screenOptions={{headerShown: false}}>
-        <Stack.Screen name="Signin" component={Signin} />
-        <Stack.Screen name="Signup" component={Signup} />
-        <Stack.Screen name="Otp" component={Otp} />
-        <Stack.Screen name="MainFeature" component={MainFeature} />
+        {loginState.userToken ? (
+          <Stack.Screen name="MainFeature" component={MainFeature} />
+        ) : (
+          <Stack.Group>
+            <Stack.Screen name="Signin" component={Signin} />
+            <Stack.Screen name="Signup" component={Signup} />
+            <Stack.Screen name="Otp" component={Otp} />
+          </Stack.Group>
+        )}
         <Stack.Screen name="ProductDetail" component={ProductDetail} />
         <Stack.Screen name="Cart" component={Cart} />
         <Stack.Screen name="Checkout" component={Checkout} />
@@ -115,8 +179,11 @@ const Router = () => {
         <Stack.Screen name="AddressCreate" component={AddressCreate} />
         <Stack.Screen name="PasswordChange" component={PasswordChange} />
       </Stack.Navigator>
-    </SafeAreaProvider>
+    </AuthContext.Provider>
   );
 };
 
 export default Router;
+const styles = StyleSheet.create({
+  pendingView: {backgroundColor: 'white', flex: 1},
+});

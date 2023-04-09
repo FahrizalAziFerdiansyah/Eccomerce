@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import {
   ButtonAction,
   Container,
@@ -30,9 +30,11 @@ import {
 import {configGoogle} from '../../utils';
 import {useDispatch, useSelector} from 'react-redux';
 import {clearLogin, login} from '../../redux/action/AuthAction';
+import {AuthContext} from '../../helpers/Context';
 
 const Signin = () => {
   const {t, i18n} = useTranslation();
+  const {signIn} = useContext(AuthContext);
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const {loginLoading, loginResult, loginError} = useSelector(
@@ -66,7 +68,7 @@ const Signin = () => {
 
   useEffect(() => {
     if (loginResult) {
-      navigation.navigate('MainFeature');
+      signIn(loginResult.token);
     }
     return () => {
       dispatch(clearLogin());
