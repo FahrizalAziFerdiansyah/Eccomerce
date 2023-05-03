@@ -7,12 +7,17 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
-import {Container, TextMedium, TextSmall} from '../../components/atoms';
+import React, {useEffect, useState} from 'react';
+import {
+  Container,
+  TextMedium,
+  TextSmall,
+  ToastCustom,
+} from '../../components/atoms';
 import {dataProduct} from '../../utils';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {responsive} from '../../styles/mixins';
-import {GRAY, PRIMARY, SECONDARY} from '../../styles/colors';
+import {DANGER, GRAY, PRIMARY, SECONDARY} from '../../styles/colors';
 import {
   FONT_SIZE_14,
   FONT_SIZE_16,
@@ -20,9 +25,33 @@ import {
 } from '../../styles/typography';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {ListRecomendation} from '../../components/molecules';
+import {useDispatch, useSelector} from 'react-redux';
+import {
+  addProductCollection,
+  clearStoreCart,
+  showProduct,
+  storeCart,
+} from '../../redux/action';
+import {formatCurrency} from '../../helpers';
 
-const ProductDetail = ({route}) => {
+const ProductDetail = ({route, navigation}) => {
+  const {
+    showProductResult,
+    showProductLoading,
+    productCollectionsResult,
+    productCollectionPaginationResultPagination,
+  } = useSelector(state => state.productReducer);
+  const {userLoading, userResult, userError} = useSelector(
+    state => state.authReducer,
+  );
+  const {storeCartError, storeCartLoading, storeCartResult, cartResult} =
+    useSelector(state => state.cartReducer);
   var param = route.params;
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(showProduct(param.id));
+  }, []);
+
   const horizontalMargin = 20;
   const slideWidth = 280;
 
@@ -30,6 +59,64 @@ const ProductDetail = ({route}) => {
   const itemWidth = slideWidth + horizontalMargin * 2;
 
   const [active, setActive] = useState(0);
+  var dataCollection = productCollectionsResult.data?.data;
+  var collection = dataCollection.filter(
+    ({product_id}) => product_id == param.id,
+  );
+  const manageCollection = item => {
+    dispatch(
+      addProductCollection({user_id: userResult.id, product_id: item.id}),
+    );
+    var indexProduct = dataCollection.findIndex(
+      ({product_id}) => product_id == item.id,
+    );
+    var indexProductCollection =
+      productCollectionPaginationResultPagination.findIndex(
+        ({product}) => product.id == item.id,
+      );
+    if (indexProduct >= 0) {
+      dataCollection.splice(indexProduct, 1);
+      productCollectionPaginationResultPagination.splice(
+        indexProductCollection,
+        1,
+      );
+    } else {
+      dataCollection.push({product_id: item.id});
+      productCollectionPaginationResultPagination.push({
+        product: item,
+      });
+    }
+  };
+  const _addToCart = () => {
+    if (showProductResult.stock > 1) {
+      var data = {
+        product_id: showProductResult.id,
+        user_id: userResult.id,
+        amount: 1,
+      };
+      dispatch(storeCart(data));
+    }
+  };
+  useEffect(() => {
+    if (storeCartResult) {
+      if (cartResult) {
+        var check = cartResult.data.findIndex(
+          ({product_id}) => product_id == storeCartResult.product_id,
+        );
+        cartResult.data[check] = storeCartResult;
+      }
+      dispatch(clearStoreCart());
+      navigation.navigate('Cart');
+    }
+  }, [storeCartResult]);
+
+  useEffect(() => {
+    if (storeCartError) {
+      ToastCustom('error', 'Failed', storeCartError);
+      dispatch(clearStoreCart());
+    }
+  }, [storeCartError]);
+
   const _renderItem = ({item, index}) => {
     return (
       <View style={styles.slide}>
@@ -42,7 +129,7 @@ const ProductDetail = ({route}) => {
     );
   };
   return (
-    <Container type={'detail'}>
+    <Container type={'detail'} loading={showProductLoading || storeCartLoading}>
       <View style={{flex: 1, marginBottom: 16}}>
         <ScrollView showsVerticalScrollIndicator={false}>
           <Carousel
@@ -62,7 +149,16 @@ const ProductDetail = ({route}) => {
           />
           <View>
             <TextSmall>Kategori</TextSmall>
-            <TextMedium fontSize={FONT_SIZE_20}>{param.name}</TextMedium>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <TextMedium fontSize={FONT_SIZE_20}>
+                {showProductResult.name}
+              </TextMedium>
+              <View style={{flex: 1}}>
+                <TextSmall textAlign={'right'}>
+                  {showProductResult.stock} Pcs
+                </TextSmall>
+              </View>
+            </View>
             <View
               style={{
                 flexDirection: 'row',
@@ -75,8 +171,12 @@ const ProductDetail = ({route}) => {
               </View>
               <TextSmall>(210 reviews)</TextSmall>
               <View style={{flex: 1, alignItems: 'flex-end'}}>
-                <TouchableOpacity>
-                  <Icon color={SECONDARY} name="heart-o" size={20} />
+                <TouchableOpacity onPress={() => manageCollection(param)}>
+                  <Icon
+                    size={20}
+                    color={collection.length ? DANGER : SECONDARY}
+                    name={collection.length ? 'heart' : 'heart-o'}
+                  />
                 </TouchableOpacity>
               </View>
             </View>
@@ -87,13 +187,7 @@ const ProductDetail = ({route}) => {
                 Product Description
               </TextMedium>
             </View>
-            <TextSmall>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book. Lorem Ipsum is
-              simply dummy text of the printing and typesetting industry.
-            </TextSmall>
+            <TextSmall>{showProductResult.description}</TextSmall>
           </View>
           <View style={{marginTop: 16}}>
             <View style={{marginBottom: 10}}>
@@ -105,10 +199,10 @@ const ProductDetail = ({route}) => {
       </View>
       <View style={styles.footer}>
         <TextMedium color={PRIMARY} fontSize={FONT_SIZE_20}>
-          Rp. 500.0000
+          Rp. {formatCurrency(showProductResult.price)}
         </TextMedium>
         <View style={{flex: 1, alignItems: 'flex-end'}}>
-          <TouchableOpacity style={styles.btnCart}>
+          <TouchableOpacity onPress={() => _addToCart()} style={styles.btnCart}>
             <View style={{marginRight: 16}}>
               <Icon color={'white'} size={26} name="shopping-cart" />
             </View>
@@ -136,6 +230,7 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: 'white',
     marginHorizontal: -16,
+    marginBottom: responsive(-16),
     flexDirection: 'row',
     alignItems: 'center',
   },

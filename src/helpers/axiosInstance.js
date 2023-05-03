@@ -1,8 +1,9 @@
 import axios from 'axios';
 import {BASE_URL, getData} from '../utils';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import {networkError} from '../redux/action/NetworkAction';
 
-export default (history = null) => {
+export default (dispatch = null) => {
   let headers = {'Content-Type': 'multipart/form-data'};
   const axiosInstance = axios.create({
     baseURL: BASE_URL,
@@ -22,11 +23,12 @@ export default (history = null) => {
       return Promise.reject(error);
     },
   );
-  axios.interceptors.response.use(
+  axiosInstance.interceptors.response.use(
     function (response) {
       return response;
     },
     function (error) {
+      dispatch(networkError(error.response.status));
       return Promise.reject(error);
     },
   );

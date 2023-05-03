@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Cart,
   Container,
@@ -15,20 +15,28 @@ import {
   TextMedium,
   TextSmall,
 } from '../../components/atoms';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useTranslation} from 'react-i18next';
 import {GRAY, GRAY_LIGHT, PRIMARY, SECONDARY} from '../../styles/colors';
 import {responsive} from '../../styles/mixins';
 import {ListCategory} from '../../components/molecules';
 import ListProduct from '../../components/molecules/ListProduct';
-import {dataCategory, dataProduct} from '../../utils';
 import {FONT_SIZE_16, FONT_SIZE_20} from '../../styles/typography';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {Banner1, Banner2, Banner3} from '../../assets';
+import {getProductCategories, getProducts} from '../../redux/action';
 
 const Home = () => {
+  const dispatch = useDispatch();
   const {mode} = useSelector(state => state.themeReducer);
+  const {
+    productCategoriesLoading,
+    productCategoriesResult,
+    productsLoading,
+    productsResult,
+  } = useSelector(state => state.productReducer);
+
   const {t, i18n} = useTranslation();
 
   const sliderWidth = Dimensions.get('window').width;
@@ -36,6 +44,12 @@ const Home = () => {
   const itemWidth = slideWidth;
   const dataImage = [Banner1, Banner2, Banner3];
   const [active, setActive] = useState(0);
+
+  useEffect(() => {
+    dispatch(getProductCategories());
+    dispatch(getProducts());
+  }, []);
+
   const _renderItem = ({item, index}) => {
     return (
       <View>
@@ -48,7 +62,9 @@ const Home = () => {
     );
   };
   return (
-    <Container type={'navbar'}>
+    <Container
+      loading={productCategoriesLoading || productsLoading}
+      type={'navbar'}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <View style={{flex: 1}}>
           <Search />
@@ -91,11 +107,11 @@ const Home = () => {
         </View>
       </View> */}
       <View style={{marginVertical: responsive(16)}}>
-        <ListCategory data={dataCategory} />
+        <ListCategory data={productCategoriesResult.data} />
       </View>
       <TextMedium fontSize={FONT_SIZE_16}> All Product!</TextMedium>
       <View style={{flex: 1, marginTop: 16}}>
-        <ListProduct data={dataProduct} />
+        <ListProduct data={productsResult.data?.data} />
       </View>
     </Container>
   );

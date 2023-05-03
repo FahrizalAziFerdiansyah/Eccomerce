@@ -12,6 +12,7 @@ import {GRAY, GRAY_DARK, GRAY_LIGHT, PRIMARY} from '../../styles/colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {AuthContext} from '../../helpers/Context';
+import {useSelector} from 'react-redux';
 
 const Menu = ({label, value, border = true, mb = true}) => {
   return (
@@ -50,7 +51,9 @@ const MenuColor = ({label, value, color, icon, mb = true, onPress}) => {
 };
 const Profile = () => {
   const navigation = useNavigation();
+  const {userResult} = useSelector(state => state.authReducer);
   const {signOut} = useContext(AuthContext);
+  console.log(userResult);
   return (
     <Container type={'navbar'}>
       <View style={{alignItems: 'center', marginTop: 16}}>

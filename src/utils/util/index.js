@@ -1,4 +1,6 @@
 export const THEME_CHANGE = 'THEME_CHANGE';
+export const NETWORK_ERROR = 'NETWORK_ERROR';
+export const CLEAR_NETWORK_ERROR = 'CLEAR_NETWORK_ERROR';
 
 export const dataCategory = [
   {id: 1, name: 'Best Deal', icon: 'tags'},
@@ -19,7 +21,7 @@ export const configGoogle = {
   forceConsentPrompt: true,
   accountName: '',
 };
-export const BASE_URL = 'http://192.168.1.6:8000/api';
+export const BASE_URL = 'http://192.168.1.9:8000/api';
 export const dataProduct = [
   {
     category_id: 1,

@@ -31,6 +31,7 @@ import {configGoogle} from '../../utils';
 import {useDispatch, useSelector} from 'react-redux';
 import {clearLogin, login} from '../../redux/action/AuthAction';
 import {AuthContext} from '../../helpers/Context';
+import { getProductCollections } from '../../redux/action';
 
 const Signin = () => {
   const {t, i18n} = useTranslation();
@@ -68,6 +69,7 @@ const Signin = () => {
 
   useEffect(() => {
     if (loginResult) {
+      dispatch(getProductCollections(loginResult.user.id));
       signIn(loginResult.token);
     }
     return () => {

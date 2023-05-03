@@ -1,5 +1,5 @@
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Container, TextMedium, TextSmall} from '../../components/atoms';
 import {ListCart} from '../../components/molecules';
 import {dataProduct} from '../../utils';
@@ -14,14 +14,36 @@ import {
 import {FONT_SIZE_16, FONT_SIZE_20} from '../../styles/typography';
 import {responsive} from '../../styles/mixins';
 import {useNavigation} from '@react-navigation/native';
+import {useDispatch, useSelector} from 'react-redux';
+import {getCart} from '../../redux/action';
+import {formatCurrency} from '../../helpers';
 
 const Index = () => {
+  const dispatch = useDispatch();
+  const {cartResult, cartLoading} = useSelector(state => state.cartReducer);
+  const {userResult} = useSelector(state => state.authReducer);
   const navigation = useNavigation();
-  var dataCart = dataProduct.splice(0, 3);
+
+  useEffect(() => {
+    dispatch(getCart(userResult.id));
+  }, []);
+
+  var amountPax =
+    cartResult && cartResult.data.reduce((n, {amount}) => n + amount, 0);
+  var priceTotal =
+    cartResult &&
+    cartResult.data.reduce((n, {product}) => n + product.price, 0);
+  var subTotal =
+    cartResult &&
+    cartResult.data.reduce(
+      (n, {amount, product}) => n + amount * product.price,
+      0,
+    );
+
   return (
-    <Container label={'My Chart'} type={'detail'}>
+    <Container loading={cartLoading} label={'My Chart'} type={'detail'}>
       <View style={{flex: 1}}>
-        <ListCart data={dataCart} />
+        <ListCart data={cartResult.data} />
       </View>
       <View style={styles.card}>
         <View style={{flexDirection: 'row'}}>
@@ -44,19 +66,21 @@ const Index = () => {
         <View style={{flexDirection: 'row', marginBottom: 16}}>
           <TextMedium>Subtotal</TextMedium>
           <View style={{flex: 1, alignItems: 'flex-end'}}>
-            <TextMedium color={SECONDARY}>Rp. 250,000</TextMedium>
+            <TextMedium color={SECONDARY}>
+              Rp. {formatCurrency(priceTotal)}
+            </TextMedium>
           </View>
         </View>
         <View style={{flexDirection: 'row'}}>
           <TextMedium>Jumlah</TextMedium>
           <View style={{flex: 1, alignItems: 'flex-end'}}>
-            <TextMedium color={SECONDARY}>2 Pax</TextMedium>
+            <TextMedium color={SECONDARY}>{amountPax} Pax</TextMedium>
           </View>
         </View>
       </View>
       <View style={styles.footer}>
         <TextMedium color={SECONDARY} fontSize={FONT_SIZE_20}>
-          Rp. 500.0000
+          Rp.{formatCurrency(subTotal)}
         </TextMedium>
         <View style={{flex: 1, alignItems: 'flex-end'}}>
           <TouchableOpacity
@@ -84,6 +108,7 @@ const styles = StyleSheet.create({
     marginHorizontal: -16,
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: responsive(-16),
   },
   btnCart: {
     flexDirection: 'row',

@@ -1,12 +1,20 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {DANGER, PRIMARY} from '../../styles/colors';
 import TextSmall from './TextSmall';
 import {responsive} from '../../styles/mixins';
 import {useNavigation} from '@react-navigation/native';
+import {useSelector} from 'react-redux';
 
 const Cart = () => {
+  const {cartResult, cartLoading} = useSelector(state => state.cartReducer);
   const navigation = useNavigation();
   return (
     <TouchableOpacity
@@ -14,9 +22,13 @@ const Cart = () => {
       style={styles.cart}>
       <Icon size={26} color={PRIMARY} name="shopping-cart" />
       <View style={styles.badge}>
-        <TextSmall fontSize={responsive(10)} color={'white'}>
-          0
-        </TextSmall>
+        {cartLoading ? (
+          <ActivityIndicator size={6} color={'white'} />
+        ) : (
+          <TextSmall fontSize={responsive(10)} color={'white'}>
+            {cartResult.data?.length || 0}
+          </TextSmall>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -34,5 +46,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 10,
     alignItems: 'center',
+    justifyContent: 'center',
   },
 });

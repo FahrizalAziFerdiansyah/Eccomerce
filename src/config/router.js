@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unstable-nested-components */
-import React, {useEffect, useMemo, useReducer} from 'react';
+import React, {useContext, useEffect, useMemo, useReducer} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
@@ -23,12 +23,16 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {Colors} from '../styles';
 import {responsive} from '../styles/mixins';
 import {Appearance, StyleSheet, View} from 'react-native';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {switchMode} from '../redux/action/ThemeAction';
 import {GRAY_MEDIUM, PRIMARY} from '../styles/colors';
 import {FONT_FAMILY_REGULAR, FONT_SIZE_14} from '../styles/typography';
 import {getData, removeData} from '../utils';
 import {AuthContext} from '../helpers/Context';
+import {axiosInstance} from '../helpers';
+import {ToastCustom} from '../components/atoms';
+import {clearNetworkError} from '../redux/action/NetworkAction';
+import {getCart, getProductCollections, getUser} from '../redux/action';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -100,6 +104,10 @@ const MainFeature = () => {
 
 const Router = () => {
   const disp = useDispatch();
+  const {error} = useSelector(state => state.networkReducer);
+  const {userLoading, userResult, userError} = useSelector(
+    state => state.authReducer,
+  );
   const colorScheme = Appearance.getColorScheme();
   disp(switchMode(colorScheme));
   const initialLoginState = {
@@ -150,11 +158,29 @@ const Router = () => {
         type: 'LOGIN',
         userToken: token,
       });
+      if (token) {
+        disp(getUser());
+      }
     };
     setTimeout(() => {
       _condition();
     }, 100);
   }, []);
+
+  useEffect(() => {
+    if (userResult) {
+      disp(getProductCollections(userResult.id));
+      disp(getCart(userResult.id));
+    }
+  }, [userResult]);
+
+  useEffect(() => {
+    if (error == 401) {
+      ToastCustom('success', 'Signout', `Please log back in`);
+      authContext.signOut();
+      disp(clearNetworkError());
+    }
+  }, [error]);
 
   if (loginState.isLoading) {
     return <View style={styles.pendingView} />;

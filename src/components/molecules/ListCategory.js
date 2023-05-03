@@ -9,14 +9,21 @@ import React, {useState} from 'react';
 import {FlatList} from 'react-native';
 import {TextSmall} from '../atoms';
 import {responsive} from '../../styles/mixins';
-import {GRAY, GRAY_LIGHT, PRIMARY, SECONDARY} from '../../styles/colors';
+import {GRAY, PRIMARY, SECONDARY} from '../../styles/colors';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import {useDispatch} from 'react-redux';
+import {getProducts} from '../../redux/action';
 
 const ListCategory = ({data}) => {
-  const [selected, setselected] = useState();
+  const [selected, setselected] = useState('');
+  const dispatch = useDispatch();
+  const _filter = id => {
+    setselected(selected == id ? '' : id);
+    dispatch(getProducts(selected == id ? '' : id));
+  };
   const renderItem = ({item}) => (
     <Pressable
-      onPress={() => setselected(item.id)}
+      onPress={() => _filter(item.id)}
       style={styles.card(selected, item.id)}>
       <View style={{marginBottom: 16}}>
         <Icon
