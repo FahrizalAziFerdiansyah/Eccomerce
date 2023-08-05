@@ -4,7 +4,8 @@ import Cart from './Cart';
 import Checkout from './Checkout';
 import {Signin, Signup, Otp, PasswordChange} from './Auth';
 import {ProfileEdit} from './Profile';
-import {Address, AddressCreate} from './Address';
+import Payment from './Payment';
+import {Address, AddressCreate, AddressEdit} from './Address';
 
 export {
   Home,
@@ -20,4 +21,6 @@ export {
   Address,
   AddressCreate,
   PasswordChange,
+  AddressEdit,
+  Payment,
 };

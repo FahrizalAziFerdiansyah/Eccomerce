@@ -13,11 +13,12 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {useNavigation, CommonActions} from '@react-navigation/native';
 import {AuthContext} from '../../helpers/Context';
 import {useSelector} from 'react-redux';
+import moment from 'moment';
 
 const Menu = ({label, value, border = true, mb = true}) => {
   return (
     <View style={styles.valueMenu(border, mb)}>
-      <TextMedium>{label}</TextMedium>
+      <TextMedium color={'black'}>{label}</TextMedium>
       <View style={styles.rightMenu}>
         <View style={{marginRight: 4}}>
           <TextMedium color={GRAY_DARK}>{value}</TextMedium>
@@ -41,7 +42,7 @@ const MenuColor = ({label, value, color, icon, mb = true, onPress}) => {
           }}>
           <Icon color={'white'} name={icon} />
         </View>
-        <TextMedium>{label}</TextMedium>
+        <TextMedium color={'black'}>{label}</TextMedium>
       </View>
       <View style={styles.rightMenu}>
         <Icon color={PRIMARY} name="chevron-right" />
@@ -51,21 +52,33 @@ const MenuColor = ({label, value, color, icon, mb = true, onPress}) => {
 };
 const Profile = () => {
   const navigation = useNavigation();
-  const {userResult} = useSelector(state => state.authReducer);
+  const {userResult, userLoading} = useSelector(state => state.authReducer);
+  const {profileResult, profileLoading} = useSelector(
+    state => state.profileReducer,
+  );
   const {signOut} = useContext(AuthContext);
-  console.log(userResult);
   return (
-    <Container type={'navbar'}>
+    <Container loading={profileLoading || userLoading} type={'navbar'}>
       <View style={{alignItems: 'center', marginTop: 16}}>
         <ImgProfile width={responsive(100)} height={responsive(100)} />
         <View style={{marginBottom: 32, alignItems: 'center'}}>
-          <TextMedium fontSize={responsive(20)}>Fahrizal Azi</TextMedium>
-          <TextSmall>Phone : 0859180657182</TextSmall>
+          <TextMedium fontSize={responsive(20)}>
+            {profileResult.name}
+          </TextMedium>
+          <TextSmall>Phone : {profileResult.phone}</TextSmall>
         </View>
         <View style={styles.cardMenu}>
-          <Menu label={'Email'} value={'fahrizaldev@gmail.com'} />
-          <Menu label={'Date of birth'} value={'20-10-1999'} />
-          <Menu label={'Gender'} value={'Male'} border={false} mb={false} />
+          <Menu label={'Email'} value={profileResult.email} />
+          <Menu
+            label={'Date of birth'}
+            value={moment(profileResult.date_of_birth).format('DD-MM-YYYY')}
+          />
+          <Menu
+            label={'Gender'}
+            value={profileResult.gender}
+            border={false}
+            mb={false}
+          />
         </View>
         <View style={[styles.cardMenu, {marginVertical: 16}]}>
           <MenuColor

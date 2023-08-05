@@ -5,12 +5,14 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {
   Address,
   AddressCreate,
+  AddressEdit,
   Cart,
   Checkout,
   Collection,
   Home,
   Otp,
   PasswordChange,
+  Payment,
   ProductDetail,
   Profile,
   ProfileEdit,
@@ -32,7 +34,15 @@ import {AuthContext} from '../helpers/Context';
 import {axiosInstance} from '../helpers';
 import {ToastCustom} from '../components/atoms';
 import {clearNetworkError} from '../redux/action/NetworkAction';
-import {getCart, getProductCollections, getUser} from '../redux/action';
+import {
+  getCart,
+  getCity,
+  getProductCollections,
+  getProfile,
+  getProvince,
+  getUser,
+} from '../redux/action';
+import ProductSearch from '../pages/Product/ProductSearch';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -139,6 +149,7 @@ const Router = () => {
             type: 'LOGIN',
             userToken: foundUser,
           });
+          disp(getUser());
         } catch (error) {}
       },
       signOut: async () => {
@@ -171,6 +182,9 @@ const Router = () => {
     if (userResult) {
       disp(getProductCollections(userResult.id));
       disp(getCart(userResult.id));
+      disp(getProfile(userResult.id));
+      disp(getProvince());
+      disp(getCity());
     }
   }, [userResult]);
 
@@ -203,7 +217,10 @@ const Router = () => {
         <Stack.Screen name="ProfileEdit" component={ProfileEdit} />
         <Stack.Screen name="Address" component={Address} />
         <Stack.Screen name="AddressCreate" component={AddressCreate} />
+        <Stack.Screen name="AddressEdit" component={AddressEdit} />
         <Stack.Screen name="PasswordChange" component={PasswordChange} />
+        <Stack.Screen name="ProductSearch" component={ProductSearch} />
+        <Stack.Screen name="Payment" component={Payment} />
       </Stack.Navigator>
     </AuthContext.Provider>
   );

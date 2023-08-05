@@ -2,6 +2,7 @@ import {StyleSheet, Text, TextInput, View} from 'react-native';
 import React, {useState} from 'react';
 import {FONT_FAMILY_REGULAR, FONT_SIZE_14} from '../../styles/typography';
 import {
+  ALERT,
   GRAY,
   GRAY_DARK,
   GRAY_LIGHT,
@@ -10,8 +11,9 @@ import {
 } from '../../styles/colors';
 import {responsive} from '../../styles/mixins';
 import TextMedium from './TextMedium';
+import TextSmall from './TextSmall';
 
-const InputArea = ({placeholder, label}) => {
+const InputArea = ({placeholder, label, error, onChange, value}) => {
   const [focus, setFocus] = useState(false);
   return (
     <View>
@@ -20,15 +22,31 @@ const InputArea = ({placeholder, label}) => {
           <TextMedium fontSize={FONT_SIZE_14}>{label}</TextMedium>
         </View>
       )}
-      <View style={styles.input(focus)}>
-        <TextInput
-          multiline
-          numberOfLines={4}
-          onBlur={() => setFocus(false)}
-          onFocus={() => setFocus(true)}
-          style={{fontFamily: FONT_FAMILY_REGULAR, textAlignVertical: 'top'}}
-          placeholder={placeholder || ''}
-        />
+      <View style={{marginBottom: responsive(12)}}>
+        <View style={styles.input(focus, error)}>
+          <TextInput
+            multiline
+            numberOfLines={4}
+            onBlur={() => setFocus(false)}
+            onFocus={() => setFocus(true)}
+            style={{
+              fontFamily: FONT_FAMILY_REGULAR,
+              textAlignVertical: 'top',
+              color: PRIMARY,
+            }}
+            placeholder={placeholder || ''}
+            onChangeText={onChange}
+            placeholderTextColor={GRAY}
+            value={value}
+          />
+        </View>
+        {error && (
+          <TextSmall
+            style={{textTransform: 'capitalize', marginTop: responsive(6)}}
+            color={ALERT}>
+            {error}
+          </TextSmall>
+        )}
       </View>
     </View>
   );
@@ -37,12 +55,11 @@ const InputArea = ({placeholder, label}) => {
 export default InputArea;
 
 const styles = StyleSheet.create({
-  input: focus => ({
+  input: (focus, error) => ({
     paddingHorizontal: 8,
     backgroundColor: 'white',
     borderRadius: 8,
-    borderColor: focus ? PRIMARY : GRAY_MEDIUM,
+    borderColor: error ? ALERT : focus ? PRIMARY : GRAY_MEDIUM,
     borderWidth: 1,
-    marginBottom: responsive(12),
   }),
 });

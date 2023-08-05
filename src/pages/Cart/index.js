@@ -1,10 +1,17 @@
-import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import React, {useEffect} from 'react';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {Container, TextMedium, TextSmall} from '../../components/atoms';
 import {ListCart} from '../../components/molecules';
 import {dataProduct} from '../../utils';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {
+  DANGER,
   GRAY,
   GRAY_DARK,
   GRAY_LIGHT,
@@ -15,18 +22,31 @@ import {FONT_SIZE_16, FONT_SIZE_20} from '../../styles/typography';
 import {responsive} from '../../styles/mixins';
 import {useNavigation} from '@react-navigation/native';
 import {useDispatch, useSelector} from 'react-redux';
-import {getCart} from '../../redux/action';
+import {getAddress, getCart} from '../../redux/action';
 import {formatCurrency} from '../../helpers';
 
 const Index = () => {
   const dispatch = useDispatch();
   const {cartResult, cartLoading} = useSelector(state => state.cartReducer);
+  const {addressResult, addressLoading} = useSelector(
+    state => state.profileReducer,
+  );
+  const [address, setaddress] = useState('');
   const {userResult} = useSelector(state => state.authReducer);
   const navigation = useNavigation();
 
   useEffect(() => {
     dispatch(getCart(userResult.id));
+    dispatch(getAddress(userResult.id));
   }, []);
+
+  useEffect(() => {
+    if (addressResult) {
+      setaddress(
+        addressResult?.data.filter(({is_selected}) => is_selected == 1)[0],
+      );
+    }
+  }, [addressResult]);
 
   var amountPax =
     cartResult && cartResult.data.reduce((n, {amount}) => n + amount, 0);
@@ -41,18 +61,14 @@ const Index = () => {
     );
 
   return (
-    <Container loading={cartLoading} label={'My Chart'} type={'detail'}>
+    <Container
+      loading={cartLoading || addressLoading}
+      label={'My Chart'}
+      type={'detail'}>
       <View style={{flex: 1}}>
         <ListCart data={cartResult.data} />
       </View>
-      <View style={styles.card}>
-        <View style={{flexDirection: 'row'}}>
-          <TextMedium>Address</TextMedium>
-          <View style={{flex: 1, alignItems: 'flex-end'}}>
-            <TextMedium color={SECONDARY}>Rp. 250,000</TextMedium>
-          </View>
-        </View>
-      </View>
+
       <View style={[styles.card, {marginBottom: 16}]}>
         <View
           style={{
@@ -61,10 +77,10 @@ const Index = () => {
             paddingBottom: 16,
             marginBottom: 16,
           }}>
-          <TextMedium>Order Summary</TextMedium>
+          <TextMedium color={'black'}>Order Summary</TextMedium>
         </View>
         <View style={{flexDirection: 'row', marginBottom: 16}}>
-          <TextMedium>Subtotal</TextMedium>
+          <TextMedium color={'black'}>Subtotal</TextMedium>
           <View style={{flex: 1, alignItems: 'flex-end'}}>
             <TextMedium color={SECONDARY}>
               Rp. {formatCurrency(priceTotal)}
@@ -72,7 +88,7 @@ const Index = () => {
           </View>
         </View>
         <View style={{flexDirection: 'row'}}>
-          <TextMedium>Jumlah</TextMedium>
+          <TextMedium color={'black'}>Jumlah</TextMedium>
           <View style={{flex: 1, alignItems: 'flex-end'}}>
             <TextMedium color={SECONDARY}>{amountPax} Pax</TextMedium>
           </View>

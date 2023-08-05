@@ -11,6 +11,14 @@ module.exports = (async () => {
   } = await getDefaultConfig();
   return {
     assets: ['./src/assets/fonts/'],
+    plugins: [
+      [
+        'react-native-reanimated/plugin',
+        {
+          relativeSourceLocation: true,
+        },
+      ],
+    ],
     transformer: {
       babelTransformerPath: require.resolve('react-native-svg-transformer'),
     },

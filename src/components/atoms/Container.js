@@ -13,6 +13,12 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import {useNavigation} from '@react-navigation/native';
 import TextMedium from './TextMedium';
 import {FONT_SIZE_16, FONT_SIZE_20} from '../../styles/typography';
+import Animated, {
+  SlideInRight,
+  Layout,
+  SlideOutRight,
+  FadeIn,
+} from 'react-native-reanimated';
 
 const Container = ({children, type, label, loading, bg}) => {
   const navigation = useNavigation();
@@ -27,21 +33,27 @@ const Container = ({children, type, label, loading, bg}) => {
             style={styles.loading}
           />
         )}
-        <View style={{flexDirection: 'row'}}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.btnBack}>
-            <Icon size={12} color={SECONDARY} name="chevron-left" />
-          </TouchableOpacity>
-          {label && (
-            <View
-              style={{justifyContent: 'center', alignItems: 'center', flex: 1}}>
-              <TextMedium fontSize={FONT_SIZE_20}>{label}</TextMedium>
-            </View>
-          )}
-        </View>
-        <View style={{marginTop: 16, flex: 1, paddingBottom: responsive(16)}}>
-          {children}
+        <View style={{flex: 1}}>
+          <View style={{flexDirection: 'row'}}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={styles.btnBack}>
+              <Icon size={12} color={SECONDARY} name="chevron-left" />
+            </TouchableOpacity>
+            {label && (
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  flex: 1,
+                }}>
+                <TextMedium fontSize={FONT_SIZE_20}>{label}</TextMedium>
+              </View>
+            )}
+          </View>
+          <View style={{marginTop: 16, flex: 1, paddingBottom: responsive(16)}}>
+            {children}
+          </View>
         </View>
       </SafeAreaView>
     );
@@ -50,16 +62,19 @@ const Container = ({children, type, label, loading, bg}) => {
     <SafeAreaView
       style={[styles.container(bg, mode), {paddingBottom: responsive(16)}]}>
       {loading && (
-        <ActivityIndicator
-          color={PRIMARY}
-          size={'large'}
-          style={styles.loading}
-        />
+        <Animated.View style={{zIndex: 100}} entering={FadeIn}>
+          <ActivityIndicator
+            color={PRIMARY}
+            size={'large'}
+            style={styles.loading}
+          />
+        </Animated.View>
       )}
-      <View
+      <Animated.View
+        entering={FadeIn.delay(100)}
         style={{flex: 1, marginBottom: type == 'navbar' ? responsive(50) : 0}}>
         {children}
-      </View>
+      </Animated.View>
     </SafeAreaView>
   );
 };
@@ -84,7 +99,7 @@ const styles = StyleSheet.create({
     right: 0,
     left: 0,
     backgroundColor: 'rgba(0,0,0,0.5)',
-    zIndex: 99,
+    zIndex: 100,
   },
 });
 export default Container;

@@ -15,7 +15,8 @@ const InputOtp = props => {
           {...props}
           onBlur={() => setFocus(false)}
           onFocus={() => setFocus(true)}
-          style={{fontFamily: FONT_FAMILY_REGULAR}}
+          style={{fontFamily: FONT_FAMILY_REGULAR, color: PRIMARY}}
+          placeholderTextColor={GRAY}
         />
       </View>
     </View>

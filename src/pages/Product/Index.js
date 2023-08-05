@@ -1,3 +1,4 @@
 import ProductDetail from './ProductDetail';
+import ProductSearch from './ProductSearch';
 
-export {ProductDetail};
+export {ProductDetail, ProductSearch};

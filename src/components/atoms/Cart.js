@@ -15,12 +15,17 @@ import {useSelector} from 'react-redux';
 
 const Cart = () => {
   const {cartResult, cartLoading} = useSelector(state => state.cartReducer);
+  const {mode} = useSelector(state => state.themeReducer);
   const navigation = useNavigation();
   return (
     <TouchableOpacity
       onPress={() => navigation.navigate('Cart')}
       style={styles.cart}>
-      <Icon size={26} color={PRIMARY} name="shopping-cart" />
+      <Icon
+        size={26}
+        color={mode == 'light' ? PRIMARY : 'white'}
+        name="shopping-cart"
+      />
       <View style={styles.badge}>
         {cartLoading ? (
           <ActivityIndicator size={6} color={'white'} />

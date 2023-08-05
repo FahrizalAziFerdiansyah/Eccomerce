@@ -14,6 +14,7 @@ import {responsive} from '../../styles/mixins';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {SECONDARY} from '../../styles/colors';
 import {useNavigation} from '@react-navigation/native';
+import Animated, {SlideInRight} from 'react-native-reanimated';
 
 const ListProduct = ({data}) => {
   const navigation = useNavigation();
@@ -43,7 +44,7 @@ const ListProduct = ({data}) => {
     </TouchableOpacity>
   );
   return (
-    <View>
+    <Animated.View entering={SlideInRight.delay(100)}>
       <FlatList
         showsHorizontalScrollIndicator={false}
         horizontal={true}
@@ -51,7 +52,7 @@ const ListProduct = ({data}) => {
         data={data}
         showsVerticalScrollIndicator={false}
       />
-    </View>
+    </Animated.View>
   );
 };
 

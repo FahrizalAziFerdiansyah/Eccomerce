@@ -13,9 +13,11 @@ import {responsive} from '../../styles/mixins';
 import TextMedium from './TextMedium';
 import TextSmall from './TextSmall';
 import {Colors} from '../../styles';
+import {useSelector} from 'react-redux';
 
-const Input = ({placeholder, label, onChange, error}) => {
+const Input = ({placeholder, label, onChange, error, value}) => {
   const [focus, setFocus] = useState(false);
+  const {mode} = useSelector(state => state.themeReducer);
   return (
     <View>
       {label && (
@@ -29,8 +31,10 @@ const Input = ({placeholder, label, onChange, error}) => {
             onChangeText={onChange}
             onBlur={() => setFocus(false)}
             onFocus={() => setFocus(true)}
-            style={{fontFamily: FONT_FAMILY_REGULAR}}
+            style={{fontFamily: FONT_FAMILY_REGULAR, color: PRIMARY}}
             placeholder={placeholder || ''}
+            placeholderTextColor={GRAY}
+            value={value}
           />
         </View>
         {error && (

@@ -23,6 +23,7 @@ export const login = (form, signIn) => dispatch => {
         storeData('token', res.data.token);
       })
       .catch(err => {
+        console.log(err);
         dispatchError(dispatch, LOGIN, err.response?.data.errors);
         if (!err.response) {
           ToastCustom('error', 'Network Error', `Please check your connection`);

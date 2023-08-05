@@ -1,4 +1,5 @@
 import {
+  Modal,
   StyleSheet,
   Text,
   TextInput,
@@ -6,30 +7,17 @@ import {
   View,
 } from 'react-native';
 import React, {useState} from 'react';
-import {FONT_FAMILY_REGULAR, FONT_SIZE_14} from '../../styles/typography';
-import {
-  GRAY,
-  GRAY_DARK,
-  GRAY_LIGHT,
-  GRAY_MEDIUM,
-  PRIMARY,
-} from '../../styles/colors';
-import {responsive} from '../../styles/mixins';
-import TextMedium from './TextMedium';
 import TextSmall from './TextSmall';
-import RNDateTimePicker from '@react-native-community/datetimepicker';
+import BottomSheet from './BottomSheet';
+import TextMedium from './TextMedium';
+import {FONT_FAMILY_REGULAR, FONT_SIZE_14} from '../../styles/typography';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import moment from 'moment';
+import {responsive} from '../../styles/mixins';
+import {GRAY_MEDIUM, PRIMARY} from '../../styles/colors';
 
-const DateTime = ({placeholder, label, type, value, onChange}) => {
-  const [focus, setFocus] = useState(false);
-  const [date, setDate] = useState(new Date());
+const SelectInput = ({label, placeholder, value, onChange, data}) => {
   const [show, setShow] = useState(false);
-  const _setDate = (event, currentDate) => {
-    setShow(false);
-    setDate(currentDate);
-    onChange(moment(date).format('DD-MM-YYYY'));
-  };
+  const [focus, setFocus] = useState(false);
   return (
     <View>
       {label && (
@@ -49,15 +37,29 @@ const DateTime = ({placeholder, label, type, value, onChange}) => {
           placeholder={placeholder || ''}
         />
         <View style={{alignSelf: 'center', paddingRight: 10}}>
-          <Icon size={responsive(20)} name="calendar" />
+          <Icon
+            size={responsive(20)}
+            name={show ? 'chevron-up' : 'chevron-down'}
+          />
         </View>
       </TouchableOpacity>
-      {show && <RNDateTimePicker value={new Date(date)} onChange={_setDate} />}
+      <BottomSheet visible={show} onClose={() => setShow(false)}>
+        {data.map(item => (
+          <TouchableOpacity
+            onPress={() => {
+              onChange(item);
+              setShow(false);
+            }}
+            style={{padding: responsive(16)}}>
+            <TextMedium>{item}</TextMedium>
+          </TouchableOpacity>
+        ))}
+      </BottomSheet>
     </View>
   );
 };
 
-export default DateTime;
+export default SelectInput;
 
 const styles = StyleSheet.create({
   input: focus => ({

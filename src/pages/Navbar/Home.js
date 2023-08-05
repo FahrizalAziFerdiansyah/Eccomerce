@@ -1,6 +1,7 @@
 import {
   Dimensions,
   Image,
+  Pressable,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -22,20 +23,21 @@ import {responsive} from '../../styles/mixins';
 import {ListCategory} from '../../components/molecules';
 import ListProduct from '../../components/molecules/ListProduct';
 import {FONT_SIZE_16, FONT_SIZE_20} from '../../styles/typography';
-import Icon from 'react-native-vector-icons/FontAwesome';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {Banner1, Banner2, Banner3} from '../../assets';
 import {getProductCategories, getProducts} from '../../redux/action';
+import Animated, {
+  SlideInRight,
+  Layout,
+  SlideOutRight,
+} from 'react-native-reanimated';
 
-const Home = () => {
+const Home = (props, {navigation}) => {
   const dispatch = useDispatch();
+  const [dataProduct, setdataProduct] = useState();
   const {mode} = useSelector(state => state.themeReducer);
-  const {
-    productCategoriesLoading,
-    productCategoriesResult,
-    productsLoading,
-    productsResult,
-  } = useSelector(state => state.productReducer);
+  const {productCategoriesResult, productsLoading, productsResult} =
+    useSelector(state => state.productReducer);
 
   const {t, i18n} = useTranslation();
 
@@ -50,6 +52,18 @@ const Home = () => {
     dispatch(getProducts());
   }, []);
 
+  const _searchProduct = text => {
+    var tmp = productsResult.data?.data.filter(
+      ({name}) => name.toLowerCase().indexOf(text.toLowerCase()) > -1,
+    );
+    setdataProduct(tmp);
+  };
+  useEffect(() => {
+    if (productsResult) {
+      setdataProduct(productsResult.data?.data);
+    }
+  }, [productsResult]);
+
   const _renderItem = ({item, index}) => {
     return (
       <View>
@@ -62,13 +76,13 @@ const Home = () => {
     );
   };
   return (
-    <Container
-      loading={productCategoriesLoading || productsLoading}
-      type={'navbar'}>
+    <Container type={'navbar'}>
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <View style={{flex: 1}}>
-          <Search />
-        </View>
+        <Pressable
+          onPress={() => navigation.navigate('ProductSearch')}
+          style={{flex: 1}}>
+          <Search search={_searchProduct} />
+        </Pressable>
         <Cart />
       </View>
       <View>
@@ -85,9 +99,9 @@ const Home = () => {
         />
         <Pagination
           containerStyle={{
-            marginTop: responsive(-80),
+            marginTop: responsive(-40),
             justifyContent: 'flex-start',
-            // marginBottom: responsive(-16),
+            marginBottom: responsive(-16),
           }}
           dotsLength={dataImage.length}
           activeDotIndex={active}
@@ -96,22 +110,14 @@ const Home = () => {
           inactiveDotScale={0.6}
         />
       </View>
-      {/* <View style={styles.card(mode)}>
-        <TextSmall color={mode !== 'light' ? 'black' : 'white'}>
-          {t('home:amountSaldo')}
-        </TextSmall>
-        <View style={{justifyContent: 'flex-end', flex: 1}}>
-          <TextLarge color={mode !== 'light' ? 'black' : 'white'}>
-            Rp. 500.0000
-          </TextLarge>
-        </View>
-      </View> */}
-      <View style={{marginVertical: responsive(16)}}>
+      <Animated.View
+        entering={SlideInRight}
+        style={{marginVertical: responsive(16), zIndex: 1}}>
         <ListCategory data={productCategoriesResult.data} />
-      </View>
+      </Animated.View>
       <TextMedium fontSize={FONT_SIZE_16}> All Product!</TextMedium>
       <View style={{flex: 1, marginTop: 16}}>
-        <ListProduct data={productsResult.data?.data} />
+        <ListProduct data={dataProduct} loading={productsLoading} />
       </View>
     </Container>
   );

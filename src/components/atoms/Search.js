@@ -7,12 +7,14 @@ import {GRAY, PRIMARY} from '../../styles/colors';
 import {useSelector} from 'react-redux';
 import {FONT_FAMILY_LIGHT, FONT_FAMILY_REGULAR} from '../../styles/typography';
 
-const Search = () => {
+const Search = ({search, editable = true}) => {
   const {t, i18n} = useTranslation();
   const {theme} = useSelector(state => state.themeReducer);
   return (
     <View style={styles.container}>
       <TextInput
+        editable={editable}
+        onChangeText={text => search(text)}
         placeholderTextColor={PRIMARY}
         style={{
           flex: 1,

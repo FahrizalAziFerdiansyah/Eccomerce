@@ -1,4 +1,10 @@
-import {CHANGE_PASSWORD, CLEAR_CHANGE_PASSWORD, CLEAR_LOGIN, LOGIN, USER} from '../../action';
+import {
+  CHANGE_PASSWORD,
+  CLEAR_CHANGE_PASSWORD,
+  CLEAR_LOGIN,
+  LOGIN,
+  USER,
+} from '../../action';
 const initialState = {
   loginLoading: false,
   loginResult: false,

@@ -18,12 +18,13 @@ import {useDispatch, useSelector} from 'react-redux';
 import {deleteCart, clearDeleteCart} from '../../redux/action';
 import {dispatchSuccess} from '../../utils';
 
-const ListCollection = ({data}) => {
+const ListCollection = ({data, isEdit = true}) => {
   const navigation = useNavigation();
   const {deleteCartResult, deleteCartLoading, cartResult} = useSelector(
     state => state.cartReducer,
   );
   const {userResult} = useSelector(state => state.authReducer);
+  const {mode} = useSelector(state => state.themeReducer);
   const dispatch = useDispatch();
   const _deleteProduct = product_id => {
     var data = {
@@ -88,48 +89,53 @@ const ListCollection = ({data}) => {
           <View style={{marginLeft: responsive(16), flex: 1}}>
             <View>
               <TextSmall color={GRAY}>Kategori</TextSmall>
-              <TextMedium fontSize={FONT_SIZE_14}>{item.name}</TextMedium>
+              <TextMedium color={'black'} fontSize={FONT_SIZE_14}>
+                {item.name}
+              </TextMedium>
             </View>
-            <TextMedium fontSize={FONT_SIZE_14}>
+            <TextMedium color={'black'} fontSize={FONT_SIZE_14}>
               Rp. {formatCurrency(item.price)}
             </TextMedium>
-            <View
-              style={{
-                justifyContent: 'flex-end',
-                flex: 1,
-              }}>
-              <View style={{flexDirection: 'row'}}>
-                <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                  <IconButton
-                    onPress={() => reduce(cart.id)}
-                    backgroundColor={GRAY_LIGHT}
-                    icon={'minus'}
-                  />
-                  <View style={{marginHorizontal: 8}}>
-                    <TextMedium>{cart.amount}</TextMedium>
+
+            {isEdit && (
+              <View
+                style={{
+                  justifyContent: 'flex-end',
+                  flex: 1,
+                }}>
+                <View style={{flexDirection: 'row'}}>
+                  <View style={{flexDirection: 'row', alignItems: 'center'}}>
+                    <IconButton
+                      onPress={() => reduce(cart.id)}
+                      backgroundColor={GRAY_LIGHT}
+                      icon={'minus'}
+                    />
+                    <View style={{marginHorizontal: 8}}>
+                      <TextMedium>{cart.amount}</TextMedium>
+                    </View>
+                    <IconButton
+                      onPress={() => add(cart.id)}
+                      backgroundColor={GRAY_LIGHT}
+                      icon={'plus'}
+                    />
                   </View>
-                  <IconButton
-                    onPress={() => add(cart.id)}
-                    backgroundColor={GRAY_LIGHT}
-                    icon={'plus'}
-                  />
-                </View>
-                <View
-                  style={{
-                    justifyContent: 'flex-end',
-                    alignSelf: 'flex-end',
-                    flex: 1,
-                  }}>
-                  <IconButton
-                    onPress={() => _deleteProduct(item.id)}
-                    style={{alignSelf: 'flex-end'}}
-                    color={DANGER}
-                    icon={'trash'}
-                    backgroundColor={GRAY_LIGHT}
-                  />
+                  <View
+                    style={{
+                      justifyContent: 'flex-end',
+                      alignSelf: 'flex-end',
+                      flex: 1,
+                    }}>
+                    <IconButton
+                      onPress={() => _deleteProduct(item.id)}
+                      style={{alignSelf: 'flex-end'}}
+                      color={DANGER}
+                      icon={'trash'}
+                      backgroundColor={GRAY_LIGHT}
+                    />
+                  </View>
                 </View>
               </View>
-            </View>
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -137,6 +143,16 @@ const ListCollection = ({data}) => {
   };
   return (
     <FlatList
+      contentContainerStyle={{flexGrow: 1}}
+      ListEmptyComponent={
+        <View
+          style={{
+            flex: 1,
+            justifyContent: 'center',
+          }}>
+          <TextSmall textAlign={'center'}>Cart Empty</TextSmall>
+        </View>
+      }
       showsVerticalScrollIndicator={false}
       renderItem={renderItem}
       data={data}

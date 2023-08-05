@@ -21,7 +21,7 @@ export const configGoogle = {
   forceConsentPrompt: true,
   accountName: '',
 };
-export const BASE_URL = 'http://192.168.1.9:8000/api';
+export const BASE_URL = 'http://192.168.1.15:8000/api';
 export const dataProduct = [
   {
     category_id: 1,
@@ -69,3 +69,21 @@ export const dataProduct = [
     desc: '  Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industrys standard dummy text ever since the 1500s,',
   },
 ];
+
+export const dataGender = [
+  {id: 'Man', name: 'Man'},
+  {id: 'Woman', name: 'Woman'},
+];
+export const dataCourier = [
+  {id: 'jne', name: 'JNE'},
+  {id: 'pos', name: 'POS'},
+  {id: 'tiki', name: 'TIKI'},
+];
+
+export const URL_MIDTRANS = 'https://app.sandbox.midtrans.com/snap/v1/';
+export const URL_MIDTRANS_STATUS = 'https://app.sandbox.midtrans.com/snap/v2/';
+export const HEADER_MIDTRANS = {
+  Accept: 'application/json',
+  'Content-TĀpe': 'application/json',
+  Authorization: 'Basic U0ItTWlkLXNlcnZlci1wakZ3Q0R6TENNOEYzMVpCdF9zSnRoRjc=',
+};

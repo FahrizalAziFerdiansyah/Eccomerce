@@ -10,20 +10,15 @@ import {
   ToastCustom,
 } from '../../components/atoms';
 import {useDispatch, useSelector} from 'react-redux';
-import {
-  clearStoreAddress,
-  getCity,
-  getProvince,
-  storeAddress,
-} from '../../redux/action';
-import {dispatchSuccess} from '../../utils';
+import {clearUpdateAddress, updateAddress} from '../../redux/action';
 
-const AddressCreate = ({navigation}) => {
+const AddressEdit = ({navigation, route}) => {
+  var param = route.params;
   const dispatch = useDispatch();
   const {
-    storeAddressLoading,
-    storeAddressResult,
-    storeAddressError,
+    updateAddressLoading,
+    updateAddressResult,
+    updateAddressError,
     addressResult,
   } = useSelector(state => state.profileReducer);
   const {userResult} = useSelector(state => state.authReducer);
@@ -36,36 +31,39 @@ const AddressCreate = ({navigation}) => {
   } = useSelector(state => state.ongkirReducer);
   const [city, setcity] = useState([]);
   const [form, setform] = useState({
-    name: '',
-    phone: '',
-    address: '',
-    type: '',
-    province_id: '',
-    city_id: '',
+    id: param.id,
+    name: param.name,
+    phone: param.phone,
+    address: param.address,
+    type: param.type,
+    province_id: param.province_id,
+    city_id: param.city_id,
     user_id: userResult.id,
   });
 
   const changeForm = (input, value) => {
-    dispatch(clearStoreAddress());
+    dispatch(clearUpdateAddress());
     setform({
       ...form,
       [input]: value,
     });
   };
   useEffect(() => {
-    if (storeAddressResult) {
-      addressResult.data.push(storeAddressResult);
+    if (updateAddressResult) {
+      let index = addressResult.data.findIndex(
+        ({id}) => id == updateAddressResult.id,
+      );
+      addressResult.data[index] = updateAddressResult;
       ToastCustom('success', 'Success', 'Success create address');
       navigation.goBack();
     }
     return () => {
-      dispatch(clearStoreAddress());
+      dispatch(clearUpdateAddress());
     };
-  }, [storeAddressResult]);
+  }, [updateAddressResult]);
   const _submit = () => {
-    dispatch(storeAddress(form));
+    dispatch(updateAddress(form));
   };
-
   useEffect(() => {
     if (form.province_id) {
       const tmpArr = getCityResult.filter(
@@ -74,28 +72,32 @@ const AddressCreate = ({navigation}) => {
       setcity(tmpArr);
     }
   }, [form.province_id]);
+
   return (
     <Container
-      loading={storeAddressLoading || getProvinceLoading || getCityLoading}
+      loading={updateAddressLoading}
       bg={'white'}
       label={'Add Address'}
       type={'detail'}>
       <View style={{flex: 1}}>
         <ScrollView>
           <Input
-            error={storeAddressError.type}
+            value={form.type}
+            error={updateAddressError.type}
             label={'Type'}
             placeholder={'Type'}
             onChange={text => changeForm('type', text)}
           />
           <Input
-            error={storeAddressError.name}
+            value={form.name}
+            error={updateAddressError.name}
             label={'Nama'}
             placeholder={'Nama'}
             onChange={text => changeForm('name', text)}
           />
           <InputPhone
-            error={storeAddressError.phone}
+            value={form.phone}
+            error={updateAddressError.phone}
             label={'Phone'}
             placeholder={'Phone'}
             onChange={text => changeForm('phone', text)}
@@ -121,7 +123,8 @@ const AddressCreate = ({navigation}) => {
             />
           )}
           <InputArea
-            error={storeAddressError.address}
+            value={form.address}
+            error={updateAddressError.address}
             label={'Address'}
             placeholder={'Address'}
             onChange={text => changeForm('address', text)}
@@ -135,6 +138,6 @@ const AddressCreate = ({navigation}) => {
   );
 };
 
-export default AddressCreate;
+export default AddressEdit;
 
 const styles = StyleSheet.create({});

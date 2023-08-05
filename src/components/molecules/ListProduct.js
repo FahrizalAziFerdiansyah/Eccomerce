@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   FlatList,
   Image,
   ImageBackground,
@@ -12,18 +13,18 @@ import {TextMedium, TextSmall, ToastCustom} from '../atoms';
 import {FONT_SIZE_14} from '../../styles/typography';
 import {responsive} from '../../styles/mixins';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import {DANGER, SECONDARY} from '../../styles/colors';
+import {DANGER, PRIMARY, SECONDARY} from '../../styles/colors';
 import {useNavigation} from '@react-navigation/native';
 import {formatCurrency} from '../../helpers';
 import {useDispatch, useSelector} from 'react-redux';
 import {dispatchSuccess} from '../../utils';
 import {addProductCollection} from '../../redux/action';
+import Animated, {FadeIn, SlideInRight} from 'react-native-reanimated';
 
-const ListProduct = ({data}) => {
+const ListProduct = ({data, loading}) => {
+  const {mode} = useSelector(state => state.themeReducer);
   const {
-    productCollectionsLoading,
     productCollectionsResult,
-    addProductCollectionLoading,
     addProductCollectionResult,
     productCollectionPaginationResultPagination,
   } = useSelector(state => state.productReducer);
@@ -63,7 +64,7 @@ const ListProduct = ({data}) => {
       ToastCustom('success', 'Success', addProductCollectionResult.message);
     }
   }, [addProductCollectionResult]);
-  const renderItem = ({item}) => {
+  const renderItem = ({item, index}) => {
     var available = [];
     if (productCollectionsResult) {
       available = dataCollection.filter(
@@ -71,7 +72,8 @@ const ListProduct = ({data}) => {
       );
     }
     return (
-      <TouchableOpacity
+      <Animated.View
+        entering={SlideInRight.delay(index * 100)}
         onPress={() => navigation.navigate('ProductDetail', item)}>
         <ImageBackground
           imageStyle={{borderRadius: 16}}
@@ -100,19 +102,34 @@ const ListProduct = ({data}) => {
             Rp. {formatCurrency(item.price)}
           </TextMedium>
         </View>
-      </TouchableOpacity>
+      </Animated.View>
     );
   };
 
   return (
-    <View>
-      <FlatList
-        columnWrapperStyle={{justifyContent: 'space-around', marginBottom: 16}}
-        numColumns={2}
-        renderItem={renderItem}
-        data={data}
-        showsVerticalScrollIndicator={false}
-      />
+    <View style={{flex: 1, justifyContent: 'center'}}>
+      {loading ? (
+        <ActivityIndicator
+          color={mode == 'light' ? PRIMARY : 'white'}
+          size={'large'}
+        />
+      ) : (
+        <Animated.View entering={FadeIn}>
+          <FlatList
+            columnWrapperStyle={{
+              justifyContent: 'space-around',
+              marginBottom: 16,
+            }}
+            numColumns={2}
+            renderItem={renderItem}
+            data={data}
+            showsVerticalScrollIndicator={false}
+            ListEmptyComponent={
+              <TextSmall textAlign={'center'}>Product Empty</TextSmall>
+            }
+          />
+        </Animated.View>
+      )}
     </View>
   );
 };

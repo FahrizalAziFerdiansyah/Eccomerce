@@ -11,12 +11,13 @@ import {FlatList} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {DANGER, SECONDARY} from '../../styles/colors';
-import {IconButton, TextMedium, TextSmall} from '../atoms';
+import {IconButton, TextMedium, TextSmall, ToastCustom} from '../atoms';
 import {responsive} from '../../styles/mixins';
 import {FONT_SIZE_14} from '../../styles/typography';
 import {formatCurrency} from '../../helpers';
 import {useDispatch, useSelector} from 'react-redux';
-import {addProductCollection} from '../../redux/action';
+import {addProductCollection, storeCart} from '../../redux/action';
+import Animated, {FadeIn, SlideInRight} from 'react-native-reanimated';
 
 const ListCollection = ({data}) => {
   const navigation = useNavigation();
@@ -45,13 +46,30 @@ const ListCollection = ({data}) => {
       );
     }
   };
-  const renderItem = ({item}) => {
+  const _addCart = item => {
+    let product = item.product;
+    if (product.stock > 1) {
+      var data = {
+        product_id: product.id,
+        user_id: userResult.id,
+        amount: 1,
+      };
+      dispatch(storeCart(data));
+      navigation.navigate('Cart');
+    } else {
+      ToastCustom('error', 'Failed', 'Stock not enough!');
+    }
+  };
+  const renderItem = ({item, index}) => {
+    console.log(index);
     var product = item.product;
     return (
-      <TouchableOpacity
-        style={{marginBottom: responsive(16)}}
-        onPress={() => navigation.navigate('ProductDetail', product)}>
-        <View style={{flexDirection: 'row'}}>
+      <Animated.View
+        entering={SlideInRight.delay(index * 100)}
+        style={{marginBottom: responsive(16)}}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('ProductDetail', product)}
+          style={{flexDirection: 'row'}}>
           <Image
             resizeMode="stretch"
             style={styles.image}
@@ -76,7 +94,11 @@ const ListCollection = ({data}) => {
                 flex: 1,
               }}>
               <View style={{flexDirection: 'row'}}>
-                <IconButton icon={'shopping-cart'} style={{marginRight: 10}} />
+                <IconButton
+                  onPress={() => _addCart(item)}
+                  icon={'shopping-cart'}
+                  style={{marginRight: 10}}
+                />
                 <IconButton
                   onPress={() => deleteCollection(product.id)}
                   color={DANGER}
@@ -85,16 +107,30 @@ const ListCollection = ({data}) => {
               </View>
             </View>
           </View>
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </Animated.View>
     );
   };
   return (
-    <FlatList
-      showsVerticalScrollIndicator={false}
-      renderItem={renderItem}
-      data={data}
-    />
+    <View style={{flex: 1}}>
+      <FlatList
+        contentContainerStyle={{
+          flexGrow: 1,
+        }}
+        showsVerticalScrollIndicator={false}
+        renderItem={renderItem}
+        data={data}
+        ListEmptyComponent={
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+            }}>
+            <TextSmall textAlign={'center'}>Collection Empty</TextSmall>
+          </View>
+        }
+      />
+    </View>
   );
 };
 

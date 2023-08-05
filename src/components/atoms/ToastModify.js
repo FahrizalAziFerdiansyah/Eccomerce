@@ -15,6 +15,7 @@ import TextSmall from './TextSmall';
 import Toast from 'react-native-toast-message';
 import {useNavigation} from '@react-navigation/native';
 import IconButton from './IconButton';
+import {PRIMARY} from '../../styles/colors';
 
 const ToastModify = ({data, type}) => {
   const navigation = useNavigation();
@@ -62,10 +63,12 @@ const ToastModify = ({data, type}) => {
           size={Mixins.responsive(40)}
         />
         <View style={{padding: 16, borderRadius: 8, flex: 1}}>
-          <TextMedium style={{fontFamily: Typography.FONT_FAMILY_BOLD}}>
+          <TextMedium
+            color={PRIMARY}
+            style={{fontFamily: Typography.FONT_FAMILY_BOLD}}>
             {data.text1}
           </TextMedium>
-          <TextSmall>{data.text2}</TextSmall>
+          <TextSmall color={PRIMARY}>{data.text2}</TextSmall>
         </View>
         <View style={{justifyContent: 'flex-end', marginRight: 16}}>
           <IconButton

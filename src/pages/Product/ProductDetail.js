@@ -33,6 +33,7 @@ import {
   storeCart,
 } from '../../redux/action';
 import {formatCurrency} from '../../helpers';
+import Animated, {FadeIn} from 'react-native-reanimated';
 
 const ProductDetail = ({route, navigation}) => {
   const {
@@ -147,7 +148,7 @@ const ProductDetail = ({route, navigation}) => {
             inactiveDotOpacity={0.4}
             inactiveDotScale={0.6}
           />
-          <View>
+          <Animated.View entering={FadeIn.delay(100)}>
             <TextSmall>Kategori</TextSmall>
             <View style={{flexDirection: 'row', alignItems: 'center'}}>
               <TextMedium fontSize={FONT_SIZE_20}>
@@ -180,7 +181,7 @@ const ProductDetail = ({route, navigation}) => {
                 </TouchableOpacity>
               </View>
             </View>
-          </View>
+          </Animated.View>
           <View style={{marginTop: 16}}>
             <View style={{marginBottom: 10}}>
               <TextMedium fontSize={FONT_SIZE_16}>

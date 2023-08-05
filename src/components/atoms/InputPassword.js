@@ -12,7 +12,7 @@ import {
   FONT_SIZE_13,
   FONT_SIZE_14,
 } from '../../styles/typography';
-import {ALERT, GRAY_DARK, PRIMARY} from '../../styles/colors';
+import {ALERT, GRAY, GRAY_DARK, PRIMARY} from '../../styles/colors';
 import {responsive} from '../../styles/mixins';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import TextMedium from './TextMedium';
@@ -33,9 +33,10 @@ const InputPassword = ({placeholder, label, onChange, error}) => {
         <View style={styles.input(focus, error)}>
           <TextInput
             onChangeText={onChange}
-            style={{fontFamily: FONT_FAMILY_REGULAR, flex: 1}}
+            style={{fontFamily: FONT_FAMILY_REGULAR, flex: 1, color: PRIMARY}}
             placeholder={placeholder || ''}
             secureTextEntry={show}
+            placeholderTextColor={GRAY}
           />
           <TouchableOpacity
             onPress={() => setShow(!show)}
